@@ -1,7 +1,10 @@
 # Longterm Strategy with fastquant
 
+Disclaimer: I have no skill in stock speculation or stock investing.
+
 Plot S&P 500 ETF (VOO) trading strategies during 2020:
 - Buy and Hold
+- Dollar-Cost Averaging
 - Simple Moving Average Crossover
 
 Proof of installation of FastQuant by Lorenzo Ampil:

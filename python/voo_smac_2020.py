@@ -1,6 +1,8 @@
 """
-Adapted from:
-https://towardsdatascience.com/backtest-your-trading-strategy-with-only-3-lines-of-python-3859b4a4ab44
+Plot S&P 500 ETF (VOO) trading strategies during 2020:
+- Buy and Hold
+- Dollar-Cost Averaging
+- Simple Moving Average Crossover
 """
 
 from fastquant.config import INIT_CASH
