@@ -21,13 +21,14 @@ from fastquant.strategies.mappings import STRATEGY_MAPPING
 base.SELL_PROP = 0.1
 
 # Reduce trades.
-ROI_THRESHOLD = 0.01
+ROI_THRESHOLD = 0.02
 
 class ValueAveragingStrategy(BaseStrategy):
     """
     Naive Daily Value Averaging Strategy
     https://en.wikipedia.org/wiki/Value_averaging
-    Compounding value.
+    Has a fixed proportion to invest.
+    Compounds that value each day.
     """
 
     def buy_signal(self):
@@ -40,6 +41,9 @@ class ValueAveragingStrategy(BaseStrategy):
         return True
 
     def sell_signal(self):
+        """
+        This selling does not account for capital gains tax.
+        """
         excess_roi = self.calculate_excess_roi()
         if excess_roi <= ROI_THRESHOLD:
             return False
@@ -50,7 +54,7 @@ class ValueAveragingStrategy(BaseStrategy):
         return True
 
     def calculate_excess_roi(self):
-        roi = self.calculate_roi()
+        roi = self.calculate_position_roi()
         target_roi = self.calculate_target_roi()
         excess_roi = roi - target_roi
         return excess_roi
@@ -63,12 +67,22 @@ class ValueAveragingStrategy(BaseStrategy):
         roi = (self.broker.get_value() / self.init_cash) - 1.0
         return roi
 
+    def calculate_position_roi(self):
+        """
+        Excludes current cash.
+        """
+        broker = self.broker
+        position_roi = ((broker.get_value() - broker.cash) / self.init_cash) - 1.0
+        return position_roi
+
     def calculate_target_roi(self):
+        self.target_fraction = 0.75
         self.annual_value_rate = 1.12
         self.trading_days_per_year = 252
         self.daily_value_rate = self.annual_value_rate ** (1.0/self.trading_days_per_year)
         num_days = len(self) + 1
         target_roi = self.daily_value_rate ** num_days
+        target_roi *= self.target_fraction
         target_roi -= 1
         return target_roi
 
